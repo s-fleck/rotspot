@@ -1,5 +1,5 @@
 get_log <- function(
-  indir
+  indir = "."
 ){
   oldwd <- getwd()
   setwd(indir)
@@ -46,16 +46,16 @@ get_log <- function(
 }
 
 
+
+
 summary.git_log <- function(x, exclude_man = TRUE, ...){
-  res <- x[grep("^man", file, invert = TRUE), .(
-    lines_mod = sum(lines_mod),
-    lines_ed  = sum(lines_ed)
-  ), by = "file"]
+  res <- x[grep("^man", entity, invert = TRUE), .(
+    lines_added = sum(lines_added),
+    lines_deleted  = sum(lines_deleted)
+  ), by = "entity"]
 
   res[, lines_mod := lines_added + lines_deleted]
 
   data.table::setorderv(res, "lines_mod", order = -1L)
-  res
-
-
+  print(res)
 }
