@@ -1,0 +1,65 @@
+---
+title: "Vignette Title"
+author: "Vignette Author"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+
+library(ggplot2)
+library(plotly)
+```
+
+
+```{r, fig.show='hold'}
+x <- analyse_package("../dplyr")
+
+x[, lines_mod := lines_added + lines_deleted]
+
+xs <- x[, .(
+  lines_added = sum(lines_added),
+  lines_deleted = sum(lines_deleted),
+  lines_mod = sum(lines_added + lines_deleted),
+  loc = loc[[1]]
+),
+  by = "entity"
+]
+
+xs <- xs[!is.na(loc)]
+data.table::setkeyv(xs, "lines_mod")
+xs <- tail(xs, 100)
+
+
+
+plot(xs$lines_mod, xs$loc)
+
+xs[, is_test := grepl("test.*", entity)]
+
+p <- ggplot(
+  xs,
+  aes(
+    x = lines_mod,
+    y = loc,
+    label = entity
+  )
+) + 
+  geom_point() +
+  geom_text(color = "blue") +
+  facet_wrap(~is_test, scales = "free")
+  
+ggplotly(p)
+
+
+
+```
