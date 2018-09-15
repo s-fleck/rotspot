@@ -1,18 +1,20 @@
 get_log <- function(
-  indir = "."
+  dir = "."
 ){
-  oldwd <- getwd()
-  setwd(indir)
-  on.exit(setwd(oldwd))
-  log <- system2(
-    "git",
-    "log --pretty=format:'%ad %h [%an]  %s' --date=short --numstat",
-    stdout = TRUE
+  withr::with_dir(
+    dir,
+    log <- system2(
+      "git",
+      "log --pretty=format:'{{header}}\t%ad\t%h\t%an\t%s' --date=short --numstat",
+      stdout = TRUE
+    )
   )
 
   res <- data.table(
-    entity = vector("character", length(log)),
     date = as.Date(NA),
+    hash = vector("character", length(log)),
+    author = NA_character_,
+    entity = NA_character_,
     lines_added = NA_integer_,
     lines_deleted = NA_integer_
   )
@@ -23,15 +25,14 @@ get_log <- function(
     if (log[[i_in]] == ""){
       next
 
-    } else if (grepl("[", log[[i_in]], fixed = TRUE)){
-      header <- list(
-        date = as.Date(substr(log[[i_in]], 1, 10)),
-        hash = substr(log[[i_in]], 12, 18)
-      )
+    } else if (grepl("{{header}}\t", log[[i_in]], fixed = TRUE)){
+      header <- parse_commit_header(log[[i_in]])
 
     } else {
       line <- strsplit(log[[i_in]], "\t", fixed = TRUE)[[1]]
       data.table::set(res, i = i_out, "date", header$date)
+      data.table::set(res, i = i_out, "hash", header$hash)
+      data.table::set(res, i = i_out, "author", header$author)
       data.table::set(res, i = i_out, "lines_added",   if (line[[1]] == "-") NA_integer_ else as.integer(line[[1]]) )
       data.table::set(res, i = i_out, "lines_deleted", if (line[[2]] == "-") NA_integer_ else as.integer(line[[2]]) )
       data.table::set(res, i = i_out, "entity",  line[[3]])
@@ -39,10 +40,14 @@ get_log <- function(
     }
   }
 
-  structure(
+  res <- structure(
     res[1:(i_out - 1L)],
     class = c("git_log", "data.table", "data.frame")
   )
+
+  data.table::setkeyv(res, c("date", "hash"))
+
+  res
 }
 
 
@@ -58,4 +63,16 @@ summary.git_log <- function(x, exclude_man = TRUE, ...){
 
   data.table::setorderv(res, "lines_mod", order = -1L)
   print(res)
+}
+
+
+
+parse_commit_header <- function(x){
+  x <- strsplit(x, "\t", fixed = TRUE)[[1]]
+
+  list(
+    date = as.Date(x[[2]]),
+    hash = x[[3]],
+    author = x[[4]]
+  )
 }
