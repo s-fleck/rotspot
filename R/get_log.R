@@ -32,8 +32,8 @@ get_log <- function(
     } else {
       line <- strsplit(log[[i_in]], "\t", fixed = TRUE)[[1]]
       data.table::set(res, i = i_out, "date", header$date)
-      data.table::set(res, i = i_out, "lines_added", as.integer(line[[1]]) )
-      data.table::set(res, i = i_out, "lines_deleted",  as.integer(line[[2]]) )
+      data.table::set(res, i = i_out, "lines_added",   if (line[[1]] == "-") NA_integer_ else as.integer(line[[1]]) )
+      data.table::set(res, i = i_out, "lines_deleted", if (line[[2]] == "-") NA_integer_ else as.integer(line[[2]]) )
       data.table::set(res, i = i_out, "entity",  line[[3]])
       i_out <- i_out + 1L
     }
