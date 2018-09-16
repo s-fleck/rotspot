@@ -1,6 +1,6 @@
 # TODO: support multiline comments (for C?)
 
-#' Analyse Lines of Code
+#' Collect Lines of Code for a Set of Files
 #'
 #' @description
 #' A *line of code* is defined as a line of text that is not either pure
@@ -10,7 +10,7 @@
 #' complexity. It is not a very reliable measure, but easy to understand and
 #' analyse.
 #'
-#' `analyse_loc()` counts the number of lines of code in one or more source
+#' `collect_loc()` counts the number of lines of code in one or more source
 #'  files
 #'
 #'
@@ -22,7 +22,7 @@
 #'   for `language` (can also be a regex pattern)
 #'
 #' @return
-#'   `analyse_loc` returns an `integer` vector of the same length as `files`,
+#'   `collect_loc` returns an `integer` vector of the same length as `files`,
 #'   containing the number of lines per file. The vector is named and the names
 #'   correspond to the names of the source files.
 #'
@@ -36,9 +36,9 @@
 #'
 #' tf <- tempfile()
 #' writeLines(src, tf)
-#' analyse_loc(tf)
+#' collect_loc(tf)
 #'
-analyse_loc <- function(
+collect_loc <- function(
   files
 ){
   assert(all(file.exists(files)))
@@ -51,7 +51,7 @@ analyse_loc <- function(
 #' `count_loc()` counts the number of elements in a character vector that are
 #'   lines of code.
 #'
-#' @rdname analyse_loc
+#' @rdname collect_loc
 #' @return `count_loc()` returns an `integer` scalar of the lines of code in `x`
 #' @export
 count_loc <- function(
@@ -68,7 +68,7 @@ count_loc <- function(
 #' @description
 #' `is_loc()` checks if the elements of a `character` vector are lines of code
 #'
-#' @rdname analyse_loc
+#' @rdname collect_loc
 #' @return `is_loc()` returns a `logical` vector of the same length as `x`
 #' @export
 is_loc <- function(
@@ -91,7 +91,7 @@ is_loc <- function(
 #' `keep_loc()` keeps only lines of code and removes all lines of whitespace
 #'   and comments from a character vector
 #'
-#' @rdname analyse_loc
+#' @rdname collect_loc
 #' @return keep_loc returns `x` without pure whitespace and comment lines
 #' @export
 keep_loc <- function(

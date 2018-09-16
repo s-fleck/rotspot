@@ -1,7 +1,7 @@
 context("analyse_indent")
 
 
-test_that("analyse_indent works as expected", {
+test_that("collect_indent works as expected", {
   tf <- rprojroot::find_testthat_root_file("testdata", "indent_testdata.R")
   td <- readLines(tf)
 
@@ -10,7 +10,7 @@ test_that("analyse_indent works as expected", {
     c(0L, 2L, 4L, 6L, 4L, 6L, 4L, 2L, 0L, 0L, 2L, 4L, 2L, 0L)
   )
 
-  expect_identical(analyse_indent(tf)[[1]], count_indent(td))
-  expect_identical(names(analyse_indent(tf)), tf)
+  expect_identical(collect_indent(tf)[[1]], count_indent(td))
+  expect_identical(names(collect_indent(tf)), tf)
 
 })

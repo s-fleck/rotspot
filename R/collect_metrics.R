@@ -1,19 +1,19 @@
-analyse_package <- function(
+collect_metrics <- function(
   dir = "."
 ){
   withr::with_dir(dir, {
-    log <- get_log(dir)
+    log <- collect_history(dir)
 
     src_files <- log[is_r_file(entity)]$entity
     src_files <- unique(src_files[file.exists(src_files)])
 
-    loc <- analyse_loc(unique(src_files))
+    loc <- collect_loc(unique(src_files))
     loc <- data.table(
       entity = names(loc),
       loc = unname(loc)
     )
 
-    ind <- analyse_indent(src_files)
+    ind <- collect_indent(src_files)
     ind <- data.table(
       entity = names(ind),
       indent = unname(ind)

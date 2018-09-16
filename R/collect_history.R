@@ -1,4 +1,4 @@
-get_log <- function(
+collect_history <- function(
   dir = "."
 ){
   withr::with_dir(
@@ -42,7 +42,7 @@ get_log <- function(
 
   res <- structure(
     res[1:(i_out - 1L)],
-    class = c("git_log", "data.table", "data.frame")
+    class = c("git_log_numstats", "data.table", "data.frame")
   )
 
   data.table::setkeyv(res, c("date", "hash"))
@@ -53,7 +53,7 @@ get_log <- function(
 
 
 
-summary.git_log <- function(x, exclude_man = TRUE, ...){
+summary.git_log_numstats <- function(x, exclude_man = TRUE, ...){
   res <- x[grep("^man", entity, invert = TRUE), .(
     lines_added = sum(lines_added),
     lines_deleted  = sum(lines_deleted)

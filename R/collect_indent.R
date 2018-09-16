@@ -1,4 +1,4 @@
-#' Analyse Whitespace for a Set of Files
+#' Collect Indent Levels for a Set of Files
 #'
 #' The number of different indention levels is a natuarl metric for code
 #' complexity
@@ -10,7 +10,7 @@
 #' @family code complexity metrics
 #'
 #' @examples
-analyse_indent <- function(
+collect_indent <- function(
   files
 ){
   setNames(
