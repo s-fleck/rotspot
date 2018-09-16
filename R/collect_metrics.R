@@ -22,10 +22,40 @@ collect_metrics <- function(
 
   res <- merge(log, loc, by = "entity", all.x = TRUE)
   res <- merge(res, ind, by = "entity", all.x = TRUE)
-  res
+
+  structure(
+    res,
+    class = union("repostats_metrics", class(res)),
+    dir = basename(fs::path_real(dir))
+  )
 }
 
 
+
+summary.repostats_metrics <- function(
+  x
+){
+  authors <- x[, .(author = unique(author)), by = "hash"][, .(commits = .N), by = "author"]
+  data.table::setorderv(authors, "commits", order = -1L)
+
+
+  languages <- unique(x, by = "hash")
+  languages[, language := tolower(tools::file_ext(languages$entity))]
+  languages[, sum(loc, na.rm = TRUE), by = "language"]
+
+
+  cat("Summary for '", attr(x, "dir"), "':", sep = "")
+
+  cat(sprintf(""))
+
+
+
+
+
+
+
+
+}
 
 
 is_r_file <- function(x){
