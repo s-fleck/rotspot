@@ -42,7 +42,7 @@ analyse_loc <- function(
   files
 ){
   assert(all(file.exists(files)))
-  vapply(files, count_loc, integer(1))
+  vapply(files, function(x) count_loc(readLines(x)), integer(1))
 }
 
 
