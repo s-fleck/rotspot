@@ -165,8 +165,8 @@ p <- ggplot(
     group = 1
   )
 ) + 
-  geom_line(aes(y = cumcommits / max(cumcommits)), color = "blue") +
-  geom_line(aes(y = lines_total / max(lines_total)), color = "red")
+  geom_line(aes(y = lines_total), color = "blue") +
+  geom_line(aes(y = lines_added), color = "red")
   
 
 p
