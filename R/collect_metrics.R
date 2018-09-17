@@ -32,6 +32,23 @@ collect_metrics <- function(
 
 
 
+collect_metrics_multi <- function(
+  dir = "."
+){
+  dirs <- list.dirs(dir, recursive = FALSE)
+  dirs <- dirs[is_r_package(dirs)]
+
+  res <- lapply(dirs, function(x) try(collect_metrics(x)))
+  names(res) <- basename(fs::path_real(dirs))
+
+  res <- data.table::rbindlist(
+     res[!vapply(res, inherits, logical(1), "try-error")],
+     idcol = "pkg"
+  )
+
+
+}
+
 summary.rotspot_metrics <- function(
   x
 ){
@@ -47,16 +64,23 @@ summary.rotspot_metrics <- function(
   cat("Summary for '", attr(x, "dir"), "':", sep = "")
 
   cat(sprintf(""))
-
-
-
-
-
-
-
-
 }
 
+
+print.rotspot_metrics <- function(x){
+  dd <- x[, .(commits = length(unique(hash))), by = "date"]
+
+  ggplot2::ggplot(
+    dd,
+    ggplot2::aes(
+      x = date,
+      y = commits
+    )
+  ) +
+    ggplot2::geom_bar(stat = "identity") +
+    facet_wrap(~pkg)
+
+}
 
 is_r_file <- function(x){
   grepl("(.*R$)|(.*r$)", x)
