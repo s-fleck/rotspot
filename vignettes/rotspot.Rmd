@@ -1,0 +1,183 @@
+---
+title: "Vignette Title"
+author: "Vignette Author"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+
+library(ggplot2)
+library(plotly)
+library(rotspot)
+
+```
+
+
+```{r, fig.show='hold'}
+x <- collect_metrics("../dplyr")
+
+x[, lines_mod := lines_added + lines_deleted]
+
+xs <- x[, .(
+  lines_added = sum(lines_added),
+  lines_deleted = sum(lines_deleted),
+  lines_mod = sum(lines_added + lines_deleted),
+  loc = loc[[1]]
+),
+  by = "entity"
+]
+
+xs <- xs[!is.na(loc)]
+data.table::setkeyv(xs, "lines_mod")
+xs <- tail(xs, 100)
+
+
+
+plot(xs$lines_mod, xs$loc)
+
+xs[, is_test := grepl("test.*", entity)]
+
+p <- ggplot(
+  xs,
+  aes(
+    x = lines_mod,
+    y = loc,
+    label = entity
+  )
+) + 
+  geom_point() +
+  geom_text(color = "blue") +
+  scale_x_continuous("effort (modified lines)") +
+  scale_y_continuous("complexity (lines of code)") +
+  facet_wrap(~is_test, scales = "free")
+  
+ggplotly(p)
+
+
+
+```
+
+
+# shape
+```{r}
+
+y <- unique(x, by = "entity")
+y <- y[sapply(y$indent, Negate(is.null))]
+y <- y[loc > 30]
+
+y <- tidyr::unnest(y, indent)
+y[, row := 1:.N, by = "entity"]
+
+
+ggplot(
+  y,
+  aes(
+    x = row,
+    y = indent
+  )
+) + 
+  geom_step() +
+  coord_flip() +
+  facet_wrap(~entity, scales = "free_y")
+
+```
+
+# code growth
+
+```{r}
+
+dd <- x[
+  !is.na(lines_added), 
+  .(
+    lines_added = sum(lines_added),
+    lines_deleted = sum(lines_deleted),
+    file_ext = tools::file_ext(entity)[[1]],
+    commits = length(unique(hash))
+  ), 
+  keyby = "date"
+]
+
+dd[, lines_total := cumsum (lines_added - lines_deleted)]
+
+p <- ggplot(
+  dd,
+  aes(
+    x = date,
+    group = 1L
+  )
+) + 
+  geom_bar(aes(y = lines_added), fill = "red", stat = "identity") +
+  geom_bar(aes(y = -lines_deleted), fill = "blue", stat = "identity") +
+  geom_line(aes(y = lines_total))
+
+ggplotly(p)
+
+
+dd[, file_ext := forcats::fct_reorder(file_ext, lines_added, sum)]
+data.table::setorderv(dd, "date")
+
+ggplot(
+  dd[file_ext %in% c("R", "cpp")],
+  aes(
+    x = date,
+    y = lines_total,
+    fill = file_ext,
+    color = file_ext
+  )
+) + 
+  geom_area(position = "stack") 
+
+
+
+
+p <- ggplot(
+  dd,
+  aes(
+    x = date,
+    y = lines_total,
+    fill = file_ext
+  )
+) + 
+  geom_area(position = "stack") +
+  geom_bar(aes(y = -lines_deleted), fill = "blue", stat = "identity") 
+
+p
+
+
+dd[, cumcommits := cumsum(commits)]
+
+
+p <- ggplot(
+  dd,
+  aes(
+    x = date,
+    group = 1
+  )
+) + 
+  geom_line(aes(y = cumcommits / max(cumcommits)), color = "blue") +
+  geom_line(aes(y = lines_total / max(lines_total)), color = "red")
+  
+
+p
+
+
+```
+
+```{r}
+
+
+
+```
+
+

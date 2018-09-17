@@ -25,14 +25,14 @@ collect_metrics <- function(
 
   structure(
     res,
-    class = union("repostats_metrics", class(res)),
+    class = union("rotspot_metrics", class(res)),
     dir = basename(fs::path_real(dir))
   )
 }
 
 
 
-summary.repostats_metrics <- function(
+summary.rotspot_metrics <- function(
   x
 ){
   authors <- x[, .(author = unique(author)), by = "hash"][, .(commits = .N), by = "author"]
