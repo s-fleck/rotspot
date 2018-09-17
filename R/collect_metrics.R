@@ -68,7 +68,7 @@ summary.rotspot_metrics <- function(
 
 
 print.rotspot_metrics <- function(x){
-  dd <- x[, .(commits = length(unique(hash))), by = "date"]
+  dd <- x[, .(commits = length(unique(hash))), by = c("date", "pkg")]
 
   ggplot2::ggplot(
     dd,
@@ -78,7 +78,7 @@ print.rotspot_metrics <- function(x){
     )
   ) +
     ggplot2::geom_bar(stat = "identity") +
-    facet_wrap(~pkg)
+    ggplot2::facet_wrap(~pkg, ncol = 3)
 
 }
 
