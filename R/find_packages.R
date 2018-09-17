@@ -34,5 +34,10 @@ list_source_files <- function(
 is_r_package <- function(
   dir = "."
 ){
-  all(file.exists(file.path(dir, c("DESCRIPTION", "NAMESPACE", "R"))))
+  is_pkg <- function(x){
+    all(file.exists(file.path(x, c("DESCRIPTION", "NAMESPACE", "R"))))
+  }
+
+  vapply(dirs, is_pkg, logical(1))
+
 }
