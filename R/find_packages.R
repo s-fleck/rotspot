@@ -38,6 +38,6 @@ is_r_package <- function(
     all(file.exists(file.path(x, c("DESCRIPTION", "NAMESPACE", "R"))))
   }
 
-  vapply(dirs, is_pkg, logical(1))
+  vapply(dir, is_pkg, logical(1))
 
 }

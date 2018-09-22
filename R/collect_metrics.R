@@ -67,18 +67,21 @@ summary.rotspot_metrics <- function(
 }
 
 
-print.rotspot_metrics <- function(x){
+plot.rotspot_metrics <- function(x){
   dd <- x[, .(commits = length(unique(hash))), by = c("date", "pkg")]
 
   ggplot2::ggplot(
     dd,
     ggplot2::aes(
       x = date,
-      y = commits
+      y = commits,
+      color = pkg
     )
   ) +
     ggplot2::geom_bar(stat = "identity") +
-    ggplot2::facet_wrap(~pkg, ncol = 3)
+    ggplot2::facet_wrap(~pkg, ncol = 1) +
+    ggplot2::theme_dark() +
+    ggplot2::scale_color_viridis_d()
 
 }
 
@@ -86,4 +89,20 @@ is_r_file <- function(x){
   grepl("(.*R$)|(.*r$)", x)
 }
 
+
+
+report_rotspot_metrics <- function(
+  x,
+  output_file = tempfile(),
+  view = requireNamespace("rstudioapi", quietly = TRUE),
+  ...,
+  template = system.file("templates/rotspot.rmd", package = "rotspot", mustWork = TRUE)
+){
+  out <- rmarkdown::render(template, params = list(dat = x))
+
+  if (view){
+    rstudioapi::viewer(out)
+  }
+
+}
 

@@ -1,0 +1,19 @@
+---
+title: "Untitled"
+output: html_document
+params:
+  dat: data.frame
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(rotspot)
+dat <- params$dat
+
+n_pkgs <- length(unique(x$pkg))
+```
+
+
+```{r, fig.height=n_pkgs}
+plot(dat)
+```
