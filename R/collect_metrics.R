@@ -74,14 +74,11 @@ plot.rotspot_metrics <- function(x){
     dd,
     ggplot2::aes(
       x = date,
-      y = commits,
-      color = pkg
-    )
+      y = commits    )
   ) +
-    ggplot2::geom_bar(stat = "identity") +
-    ggplot2::facet_wrap(~pkg, ncol = 1) +
+    ggplot2::geom_bar(stat = "identity", color = "#FDE725FF") +
     ggplot2::theme_dark() +
-    ggplot2::scale_color_viridis_d()
+    ggplot2::facet_grid(pkg ~ .)
 
 }
 

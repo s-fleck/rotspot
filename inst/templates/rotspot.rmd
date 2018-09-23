@@ -1,19 +1,39 @@
 ---
-title: "Untitled"
+title: "Multi repository overview"
 output: html_document
 params:
   dat: data.frame
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE)
 library(rotspot)
 dat <- params$dat
 
 n_pkgs <- length(unique(x$pkg))
 ```
 
+# by author
+
+```{r, fig.height=length(unique(x$author))}
+  dd <- dat[, .(commits = length(unique(hash))), by = c("date", "author")]
+
+  ggplot2::ggplot(
+    dd,
+    ggplot2::aes(
+      x = date,
+      y = commits    )
+  ) +
+    ggplot2::geom_bar(stat = "identity", color = "#B4DE2CFF") +
+    ggplot2::theme_dark() +
+    ggplot2::facet_grid(author ~ .)
+```
+
+
+# By package
 
 ```{r, fig.height=n_pkgs}
-plot(dat)
+plot(dat) 
+plot(dat) +
+    ggplot2::theme_dark() 
 ```
