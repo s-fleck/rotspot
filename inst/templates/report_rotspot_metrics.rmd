@@ -19,14 +19,14 @@ n_pkgs <- length(unique(x$pkg))
 
 # By package
 
-```{r, fig.height=n_pkgs}
+```{r, fig.height=1 + n_pkgs}
 plot(dat) 
 
 ```
 
 # By Author
 
-```{r, fig.height=length(unique(x$author))}
+```{r, fig.height=2 + length(unique(x$author))}
   dd <- dat[, .(
     commits = length(unique(hash))
   ), 

@@ -9,6 +9,15 @@ as_rotspot_metrics <- function(
 
 
 
+#' Collect Metrics
+#' 
+#' Collect code-quality metrics for R packages from files and git repositories
+#'
+#' @param dir an \R-Package, or a directory that contains several \R-Packages.
+#'
+#' @return A `data.table` with additional subclass `rotspot_metrics`
+#' @export
+#'
 collect_metrics <- function(
   dir = "."
 ){
@@ -151,7 +160,8 @@ plot.rotspot_metrics <- function(x){
       x = date,
       y = commits)
   ) +
-    ggplot2::geom_bar(stat = "identity", color = "#FDE725FF") +
+    ggplot2::geom_bar(stat = "identity", color = "#FDE725FF", fill = "#FDE725FF") +
+    ggplot2::scale_y_continuous(breaks = scales::pretty_breaks()) +
     ggplot2::theme_dark() +
     ggplot2::facet_grid(pkg ~ .) 
 }
@@ -161,21 +171,4 @@ plot.rotspot_metrics <- function(x){
 
 is_r_file <- function(x){
   grepl("(.*R$)|(.*r$)", x)
-}
-
-
-
-
-report.rotspot_metrics <- function(
-  x,
-  output_file = tempfile(),
-  view = requireNamespace("rstudioapi", quietly = TRUE),
-  ...,
-  template = system.file("templates/report_rotspot_metrics.rmd", package = "rotspot", mustWork = TRUE)
-){
-  out <- rmarkdown::render(template, params = list(dat = x))
-
-  if (view){
-    rstudioapi::viewer(out)
-  }
 }
