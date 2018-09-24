@@ -1,4 +1,4 @@
 #' @keywords internal
 #' @importFrom data.table data.table
-#' @import futile.logger
+#' @import futile.logger assertthat
 "_PACKAGE"
