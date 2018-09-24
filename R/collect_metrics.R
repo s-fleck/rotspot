@@ -189,7 +189,7 @@ report.rotspot_metrics <- function(
   output_file = tempfile(),
   view = requireNamespace("rstudioapi", quietly = TRUE),
   ...,
-  template = system.file("templates/rotspot.rmd", package = "rotspot", mustWork = TRUE)
+  template = system.file("templates/report_rotspot_metrics.rmd", package = "rotspot", mustWork = TRUE)
 ){
   out <- rmarkdown::render(template, params = list(dat = x))
 
