@@ -69,6 +69,7 @@ summary.git_log_numstats <- function(x, exclude_man = TRUE, ...){
 
 
 
+
 parse_commit_header <- function(x){
   x <- strsplit(x, "\t", fixed = TRUE)[[1]]
 

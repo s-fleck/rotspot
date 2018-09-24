@@ -1,4 +1,29 @@
+as_rotspot_metrics <- function(
+  x
+){
+  
+}
+
+
 collect_metrics <- function(
+  dir = "."
+){
+  if (is_r_package(dir))
+    res <- collect_metrics_single(dir)
+  else
+    res <- collect_metrics_multi(dir)
+  
+  structure(
+    res,
+    class = union("rotspot_metrics", class(res)),
+    dir = basename(fs::path_real(dir))
+  )
+}
+
+
+
+
+collect_metrics_single <- function(
   dir = "."
 ){
   withr::with_dir(dir, {
@@ -22,13 +47,11 @@ collect_metrics <- function(
 
   res <- merge(log, loc, by = "entity", all.x = TRUE)
   res <- merge(res, ind, by = "entity", all.x = TRUE)
-
-  structure(
-    res,
-    class = union("rotspot_metrics", class(res)),
-    dir = basename(fs::path_real(dir))
-  )
+  res[, pkg := basename(fs::path_real(dir))]
+  data.table::setcolorder(res, union("pkg", names(res)))
+  res
 }
+
 
 
 
@@ -37,15 +60,18 @@ collect_metrics_multi <- function(
 ){
   dirs <- list.dirs(dir, recursive = FALSE)
   dirs <- dirs[is_r_package(dirs)]
-
   res <- lapply(dirs, function(x) try(collect_metrics(x)))
-  names(res) <- basename(fs::path_real(dirs))
+  
+  browser()
 
   res <- data.table::rbindlist(
      res[!vapply(res, inherits, logical(1), "try-error")],
      idcol = "pkg"
   )
 }
+
+
+
 
 summary.rotspot_metrics <- function(
   x
@@ -65,6 +91,8 @@ summary.rotspot_metrics <- function(
 }
 
 
+
+
 plot.rotspot_metrics <- function(x){
   dd <- x[, .(commits = length(unique(hash))), by = c("date", "pkg")]
 
@@ -80,39 +108,12 @@ plot.rotspot_metrics <- function(x){
 
 }
 
+
+
+
 is_r_file <- function(x){
   grepl("(.*R$)|(.*r$)", x)
 }
-
-
-
-report_commits <- function(
-  x,
-  template = system.file("templates", "report_commits.Rmd", package = "rotspot")
-){
-    dd <- x[, .(commits = length(unique(hash))), by = c("date", "pkg")]
-
-    
-    ps <- lapply(unique(dd$pkg), function(.x){
-      plotly::plot_ly(
-        x = dd[pkg == .x]$date,
-        y = dd[pkg == .x]$commits,
-        type = "bar",
-        height = 150
-      ) %>% 
-        plotly::layout(
-          title = .x,
-          xaxis = list(range = range(dd$date), title = "", showticklabels = FALSE, zeroline = TRUE, showgrid = TRUE),
-          yaxis = list(range = range(dd$commits), zeroline = TRUE)
-        )
-    })
-    
-    
-    browsable(do.call(tagList, ps))
-
-  
-}
-
 
 
 
@@ -134,14 +135,12 @@ plot_commits <- function(
       ggplot2::facet_grid(pkg ~ .) +
       ggplot2::scale_color_viridis_c() +
       ggplot2::theme_dark()
-
-  
 }
 
 
 
 
-report_rotspot_metrics <- function(
+report.rotspot_metrics <- function(
   x,
   output_file = tempfile(),
   view = requireNamespace("rstudioapi", quietly = TRUE),
@@ -155,4 +154,3 @@ report_rotspot_metrics <- function(
   }
 
 }
-
