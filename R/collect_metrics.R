@@ -139,17 +139,21 @@ summary.rotspot_metrics <- function(
 
 plot.rotspot_metrics <- function(x){
   dd <- x[, .(commits = length(unique(hash))), by = c("date", "pkg")]
+  
+  order <- dd[, .(commits = sum(commits)), by = "pkg"]
+  data.table::setkeyv(order, "commits")
+  dd[, pkg := factor(pkg, levels = rev(order$pkg))]
+  
 
   ggplot2::ggplot(
     dd,
     ggplot2::aes(
       x = date,
-      y = commits    )
+      y = commits)
   ) +
     ggplot2::geom_bar(stat = "identity", color = "#FDE725FF") +
     ggplot2::theme_dark() +
     ggplot2::facet_grid(pkg ~ .)
-
 }
 
 
@@ -157,28 +161,6 @@ plot.rotspot_metrics <- function(x){
 
 is_r_file <- function(x){
   grepl("(.*R$)|(.*r$)", x)
-}
-
-
-
-
-plot_commits <- function(
-  x,
-  template = system.file("templates", "report_commits.Rmd", package = "rotspot")
-){
-    dd <- x[, .(commits = length(unique(hash))), by = c("date", "pkg")]
-    
-    p <- ggplot2::ggplot(
-      dd,
-      ggplot2::aes(
-        x = date,
-        y = commits
-      )
-    ) + 
-      ggplot2::geom_bar(stat = "identity") +
-      ggplot2::facet_grid(pkg ~ .) +
-      ggplot2::scale_color_viridis_c() +
-      ggplot2::theme_dark()
 }
 
 
