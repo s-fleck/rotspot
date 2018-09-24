@@ -72,11 +72,11 @@ plot.rotspot_metrics <- function(x){
     dd,
     ggplot2::aes(
       x = date,
-      y = commits
-    )
+      y = commits    )
   ) +
-    ggplot2::geom_bar(stat = "identity") +
-    ggplot2::facet_wrap(~pkg, ncol = 3)
+    ggplot2::geom_bar(stat = "identity", color = "#FDE725FF") +
+    ggplot2::theme_dark() +
+    ggplot2::facet_grid(pkg ~ .)
 
 }
 
@@ -139,4 +139,20 @@ plot_commits <- function(
 }
 
 
+
+
+report_rotspot_metrics <- function(
+  x,
+  output_file = tempfile(),
+  view = requireNamespace("rstudioapi", quietly = TRUE),
+  ...,
+  template = system.file("templates/rotspot.rmd", package = "rotspot", mustWork = TRUE)
+){
+  out <- rmarkdown::render(template, params = list(dat = x))
+
+  if (view){
+    rstudioapi::viewer(out)
+  }
+
+}
 
