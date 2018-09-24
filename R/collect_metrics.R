@@ -45,8 +45,6 @@ collect_metrics_multi <- function(
      res[!vapply(res, inherits, logical(1), "try-error")],
      idcol = "pkg"
   )
-
-
 }
 
 summary.rotspot_metrics <- function(
@@ -67,7 +65,7 @@ summary.rotspot_metrics <- function(
 }
 
 
-print.rotspot_metrics <- function(x){
+plot.rotspot_metrics <- function(x){
   dd <- x[, .(commits = length(unique(hash))), by = c("date", "pkg")]
 
   ggplot2::ggplot(
@@ -85,5 +83,60 @@ print.rotspot_metrics <- function(x){
 is_r_file <- function(x){
   grepl("(.*R$)|(.*r$)", x)
 }
+
+
+
+report_commits <- function(
+  x,
+  template = system.file("templates", "report_commits.Rmd", package = "rotspot")
+){
+    dd <- x[, .(commits = length(unique(hash))), by = c("date", "pkg")]
+
+    
+    ps <- lapply(unique(dd$pkg), function(.x){
+      plotly::plot_ly(
+        x = dd[pkg == .x]$date,
+        y = dd[pkg == .x]$commits,
+        type = "bar",
+        height = 150
+      ) %>% 
+        plotly::layout(
+          title = .x,
+          xaxis = list(range = range(dd$date), title = "", showticklabels = FALSE, zeroline = TRUE, showgrid = TRUE),
+          yaxis = list(range = range(dd$commits), zeroline = TRUE)
+        )
+    })
+    
+    
+    browsable(do.call(tagList, ps))
+
+  
+}
+
+
+
+
+
+plot_commits <- function(
+  x,
+  template = system.file("templates", "report_commits.Rmd", package = "rotspot")
+){
+    dd <- x[, .(commits = length(unique(hash))), by = c("date", "pkg")]
+    
+    p <- ggplot2::ggplot(
+      dd,
+      ggplot2::aes(
+        x = date,
+        y = commits
+      )
+    ) + 
+      ggplot2::geom_bar(stat = "identity") +
+      ggplot2::facet_grid(pkg ~ .) +
+      ggplot2::scale_color_viridis_c() +
+      ggplot2::theme_dark()
+
+  
+}
+
 
 
