@@ -73,7 +73,7 @@ collect_metrics_multi <- function(
   for (i in seq_along(pkgs)){
     res[[i]] <- tryCatch(
       collect_metrics_single(pkgs[[i]]),
-      error = function(e) {flog.fatal(e); NULL}
+      error = function(e) { cat("\n"); flog.fatal(e); NULL }
     )
     pb$tick(tokens = list(pkg = pkgs[[i]]))
   }  
@@ -153,7 +153,7 @@ plot.rotspot_metrics <- function(x){
   ) +
     ggplot2::geom_bar(stat = "identity", color = "#FDE725FF") +
     ggplot2::theme_dark() +
-    ggplot2::facet_grid(pkg ~ .)
+    ggplot2::facet_grid(pkg ~ .) 
 }
 
 
