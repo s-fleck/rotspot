@@ -9,7 +9,9 @@ collect_history <- function(
       stdout = TRUE
     )
   )
-
+  
+  if (length(log) == 0)  stop("No git directory found")
+  
   res <- data.table(
     date = as.Date(NA),
     hash = vector("character", length(log)),
