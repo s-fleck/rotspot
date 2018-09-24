@@ -1,16 +1,20 @@
 collect_history <- function(
   dir = "."
 ){
-  withr::with_dir(
+  
+  suppressWarnings(withr::with_dir(
     dir,
     log <- system2(
       "git",
       "log --pretty=format:'{{header}}\t%ad\t%h\t%an\t%s' --date=short --numstat",
-      stdout = TRUE
+      stdout = TRUE,
+      stderr = NULL
     )
-  )
+  ))
   
-  if (length(log) == 0)  stop("No git directory found")
+  if (length(log) == 0){
+    stop(sprintf("No git directory found in '%s'", fs::path_real(dir)), call. = FALSE)
+  }  
   
   res <- data.table(
     date = as.Date(NA),
