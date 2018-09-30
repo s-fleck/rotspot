@@ -20,6 +20,8 @@ RoxygenNote: 6.1.0.9000
 Suggests: 
     testthat,
     knitr,
-    rmarkdown
+    rmarkdown,
+    ggplot2,
+    gridExtra
 VignetteBuilder: knitr
 Roxygen: list(markdown=TRUE)
