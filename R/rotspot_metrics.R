@@ -87,18 +87,22 @@ print.rotspot_metrics_summary <- function(
 
   xf$pkgs <- as.matrix(dd$pkgs)
   xf$pkgs <- rbind(c("Package", "Commits"), xf$pkgs)
-  xf$pkgs <- pad_matrix(xf$pkgs)
-
   xf$authors <- as.matrix(dd$authors)
   xf$authors <- rbind(c("Author", "Commits"), xf$authors)
-  xf$authors <- pad_matrix(xf$authors)
-
   xf$languages <- as.matrix(dd$languages)
   xf$languages <- rbind(c("Language", "Commits"), xf$languages)
-  xf$languages <- pad_matrix(xf$languages)
-
   vspace <- paste(rep(" ", 6), collapse = "")
+  
+  nrow_max <- max(vapply(xf, nrow, integer(1)))
 
+  xf <- lapply(xf, function(.x) {
+    diff <- nrow_max - nrow(.x)
+    if (diff > 0) 
+      pad_matrix(rbind(.x, matrix("", nrow = diff, ncol = ncol(.x)))) 
+    else 
+      pad_matrix(.x)
+  })  
+  
   xf <- cbind(xf$pkgs, vspace, xf$authors, vspace, xf$languages, "\n")
   xf <- apply(xf, 1, paste, collapse = "")
 
@@ -159,7 +163,7 @@ plot.summary_rotspot_metrics <- function(
 #' @examples
 plot.rotspot_metrics <- function(
   x,
-  n = 6
+  n = NULL
 ){
   assert(is_scalar_integerish(n) || is.null(n))
   dd <- x[, .(commits = length(unique(hash))), by = c("date", "pkg")]
