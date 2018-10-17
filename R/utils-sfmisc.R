@@ -176,14 +176,14 @@ is_scalar_integerish <- function(x){
 
 
 
-is_tf <- function(x){
+is_bool <- function(x){
   is.logical(x) && !anyNA(x)
 }
 
 
 
 
-is_scalar_tf <- function(x){
+is_scalar_bool <- function(x){
   identical(x, TRUE) || identical(x, FALSE)
 }
 

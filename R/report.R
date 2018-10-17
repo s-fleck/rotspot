@@ -20,7 +20,7 @@ report <- function(
 ){
   assert_that(
     is_scalar_character(output_file),
-    is_scalar_tf(view)
+    is_scalar_bool(view)
   )
   
   UseMethod("report")

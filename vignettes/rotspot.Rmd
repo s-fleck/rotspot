@@ -24,9 +24,33 @@ library(rotspot)
 ```
 
 
-```{r, fig.show='hold'}
-x <- collect_metrics("../dplyr")
+```{r init}
+x <- collect_metrics("~/rpkgs")
 
+stefans <- c("stefan.b.fleck@gmail.com", "stefan", "FLECK Stefan", "Stefan Fleck - U", "stefan.fleck")
+
+x[tolower(author) %in% tolower(stefans), author := "Stefan Fleck"]
+
+summary(x)
+
+
+ggplotly(plot(x))
+```
+
+
+# Overview
+
+
+```{r}
+
+summary(x)
+
+```
+
+
+
+
+```{r, fig.show='hold'}
 x[, lines_mod := lines_added + lines_deleted]
 
 xs <- x[, .(
@@ -41,6 +65,7 @@ xs <- x[, .(
 xs <- xs[!is.na(loc)]
 data.table::setkeyv(xs, "lines_mod")
 xs <- tail(xs, 100)
+
 
 
 

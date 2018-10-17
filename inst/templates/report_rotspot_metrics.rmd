@@ -12,10 +12,22 @@ editor_options:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 library(rotspot)
+library(ggplot2)
+library(ggbeeswarm)
+  
 dat <- params$dat
 
-n_pkgs <- length(unique(x$pkg))
+n_pkgs <- length(unique(dat$pkg))
 ```
+
+```{r}
+
+
+dat[author %in% c("stefan.b.fleck@gmail.com", "FLECK Stefan", "Stefan", "stefan", "stefan.fleck", "Stefan Fleck - U", "s_fleck"), author := "Stefan Fleck"]
+
+
+```
+
 
 # By package
 
@@ -48,4 +60,36 @@ plot(dat)
     ggplot2::theme_dark() +
     ggplot2::facet_grid(author ~ .) 
 ```
+
+
+# Weekdays
+
+```{r, fig.height=2 + length(unique(x$author))}
+
+  dd <- dat[
+    author == "Stefan Fleck" & lines_added > 5, 
+    .(
+      commits = length(unique(hash))
+    ), 
+      by = c("date", "author")
+  ]
+
+  dd[, wday := hammr::wday2(date)]
+  
+  pdat <- dd
+
+  ggplot(
+    pdat,
+    aes(
+      x = wday,
+      group = wday,
+      y = commits
+    )
+  ) + 
+    geom_boxplot()
+
+
+
+```
+
 
